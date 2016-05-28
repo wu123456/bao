@@ -79,6 +79,7 @@
 			BaoObject.call(this);
 			this.node = null;
 			this.html = '';
+			Bao.extend(this, params);
 			this.props = params.props || {}; // 用于储存不变的数据
 			this.state = params.state || {}; // 用于储存变化的数据（通过setState调用，引发变化后，会重新绘图）
 			this.tpl = params.tpl; // 用于绘图的模板

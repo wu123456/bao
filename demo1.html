@@ -9,7 +9,7 @@
         <meta name="format-detection" content="telephone=no"/>
         <title>欢迎使用BaoJs</title>
         <script src="http://apps.bdimg.com/libs/zepto/1.1.4/zepto.min.js"></script>
-        <script src="./bao.min.js"></script>
+        <script src="./bao.js"></script>
 
         <style type="text/css">
             html {height: 100%;}
@@ -27,12 +27,12 @@
 
     </head>
     <body>
-        <div class="chat-list"></div>
+        <div class="chat-$list"></div>
         
     </body>
 
     <script type="text/html" id="item_tpl">
-        <div class="row">
+        <div class="row" >
             <span class="content">{content}</span>
             <span class="time">{time}</span>
             <div class="clearfix"></div>
@@ -70,22 +70,25 @@
             }
         ];
 
+        var chat_items = [], chat_item;
+
         $(function(){
             var ChatItem = Bao.createBaoComponent({
                 tpl : $("#item_tpl").html()
             });
 
-            var chat_items = [], chat_item;
             for(var i in chat_list){
                 chat_item = new ChatItem({
-                    props : chat_list[i]
+                    props : chat_list[i],
+                    
                 });
                 chat_items.push(chat_item);
             }
 
-            Bao.renderBaoComponent(chat_items, $(".chat-list"));
+            Bao.renderBaoComponent(chat_items, $(".chat-$list"));
 
         });
+
 
     </script>
 
