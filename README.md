@@ -15,11 +15,11 @@ Here is the first one to get you started:
 ```
 
 ```js
-var ChatItem = Bao.createBaoComponent({
-    tpl : $("#item_tpl").html(),
+var HelloItem = Bao.createBaoComponent({
+    tpl : $("#tpl").html(),
 });
 
-Bao.renderBaoComponent(new ChatItem({'props':{'name':'Awu'}}), $("#container"));
+Bao.renderBaoComponent(new HelloItem({'props':{'name':'Awu'}}), $("#container"));
 ```
 
 This example will render "Hello Awu" into a container on the page.
