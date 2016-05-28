@@ -75,73 +75,85 @@
 		}
 
 	// BaoComponent
-		function BaoComponent(params){
-			BaoObject.call(this);
-			this.node = null;
-			this.html = '';
-			Bao.extend(this, params);
-			this.props = params.props || {}; // 用于储存不变的数据
-			this.state = params.state || {}; // 用于储存变化的数据（通过setState调用，引发变化后，会重新绘图）
-			this.tpl = params.tpl; // 用于绘图的模板
-			this.preHandleFunc = params.preHandleFunc; // 用于预处理数据的函数
-		}
-		BaoComponent.prototype =  new BaoObject();
-		BaoComponent.prototype.constructor = BaoComponent;
-
-		Bao.extend(BaoComponent.prototype,{
-			defaultPreHandleFunc : function(){
-				return Bao.extend({},this.props, this.state);
-			},
-			setState : function(params){
-				this.state = Bao.extend(this.state, params);
-				var data = (typeof this.preHandleFunc === "function") ? this.preHandleFunc() : this.defaultPreHandleFunc();
-				var html = Bao.drawTPL(this.tpl, data);
-				// 没有变化，不需要重新渲染
-				if (html === this.html) {
-					return;
-				};
-				// 变化之后，重新渲染
-				var node = $(html);
-				this.node.html(node.html());
-			},
-			render : function(){
-				var data = (typeof this.preHandleFunc === "function") ? this.preHandleFunc() : this.defaultPreHandleFunc();
-				this.html = Bao.drawTPL(this.tpl, data);
-				this.node = $(this.html);
-				return this.node;
-			},
-			destory : function(){
-				this.node.remove();
+		+function(){
+			var revent = /<[\w\W]*@(onclick)="(\w*)"\s*[\s|>]/i;
+			function BaoComponent(params){
+				BaoObject.call(this);
+				this.node = null;
+				this.html = '';
+				Bao.extend(this, params);
+				this.props = params.props || {}; // 用于储存不变的数据
+				this.state = params.state || {}; // 用于储存变化的数据（通过setState调用，引发变化后，会重新绘图）
+				this.tpl = params.tpl; // 用于绘图的模板
+				this.preHandleFunc = params.preHandleFunc; // 用于预处理数据的函数
 			}
-		})
-		BaoComponent.prototype.toString = BaoComponent.prototype.render;
+			BaoComponent.prototype =  new BaoObject();
+			BaoComponent.prototype.constructor = BaoComponent;
 
-		Bao.extend(Bao, {
-			// params contains tpl, preHandleFunc
-			createBaoComponent : function(params){
-				var BComponent = function(p){
-					BaoComponent.call(this, Bao.extend({}, params, p));
+			Bao.extend(BaoComponent.prototype,{
+				defaultPreHandleFunc : function(){
+					return Bao.extend({},this.props, this.state);
+				},
+				setState : function(params){
+					this.state = Bao.extend(this.state, params);
+					var data = (typeof this.preHandleFunc === "function") ? this.preHandleFunc() : this.defaultPreHandleFunc();
+					var html = Bao.drawTPL(this.tpl, data);
+					// 没有变化，不需要重新渲染
+					if (html === this.html) {
+						return;
+					};
+					// 变化之后，重新渲染
+					var node = $(html);
+					this.node.html(node.html());
+				},
+				render : function(){
+					var data = (typeof this.preHandleFunc === "function") ? this.preHandleFunc() : this.defaultPreHandleFunc();
+					this.html = Bao.drawTPL(this.tpl, data);
+					this.node = $(this.html);
+					this.html && this._bindEvent();
+					return this.node;
+				},
+				destory : function(){
+					this.node.remove();
+				},
+				_bindEvent : function(){
+					var res = revent.exec(this.html);
+					console.log(res);
+					res && this.events && typeof this.events[res[2]] === 'function' && this.node.on('click', function(){
+						(this.events[res[2]].bind(this))();
+					}.bind(this))
 				}
-				BComponent.prototype = BaoComponent.prototype;
-				return BComponent;
-			},
-			renderBaoComponent : function(c, target){
-				var i;
-				if (Bao.classof(c) == "Array") {
-					str = c.forEach(function(cur){
-						$(target).append(cur.render());
-					});
-				}else if(c instanceof BaoComponent){
-					$(target).append(c.render());
-				}else if(Bao.classof(c) == "Object"){
-					for( i in c ){
-						$(target).append(c[i].render());
+			})
+			BaoComponent.prototype.toString = BaoComponent.prototype.render;
+
+			Bao.extend(Bao, {
+				// params contains tpl, preHandleFunc
+				createBaoComponent : function(params){
+					var BComponent = function(p){
+						BaoComponent.call(this, Bao.extend({}, params, p));
 					}
-				}else{
-					$(target).append(c);
+					BComponent.prototype = BaoComponent.prototype;
+					return BComponent;
+				},
+				renderBaoComponent : function(c, target){
+					var i;
+					if (Bao.classof(c) == "Array") {
+						str = c.forEach(function(cur){
+							$(target).append(cur.render());
+						});
+					}else if(c instanceof BaoComponent){
+						$(target).append(c.render());
+					}else if(Bao.classof(c) == "Object"){
+						for( i in c ){
+							$(target).append(c[i].render());
+						}
+					}else{
+						$(target).append(c);
+					}
 				}
-			}
-		});
+			});
+		}()
+		
 
 	// BaoConnect
 		function BaoConnect(){

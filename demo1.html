@@ -27,12 +27,12 @@
 
     </head>
     <body>
-        <div class="chat-$list"></div>
+        <div class="chat-list"></div>
         
     </body>
 
     <script type="text/html" id="item_tpl">
-        <div class="row" >
+        <div class="row" @onclick="show">
             <span class="content">{content}</span>
             <span class="time">{time}</span>
             <div class="clearfix"></div>
@@ -74,7 +74,12 @@
 
         $(function(){
             var ChatItem = Bao.createBaoComponent({
-                tpl : $("#item_tpl").html()
+                tpl : $("#item_tpl").html(),
+                events : {
+                    show : function(){
+                        alert("作者是" + this.props.author);
+                    }
+                }
             });
 
             for(var i in chat_list){
@@ -85,7 +90,7 @@
                 chat_items.push(chat_item);
             }
 
-            Bao.renderBaoComponent(chat_items, $(".chat-$list"));
+            Bao.renderBaoComponent(chat_items, $(".chat-list"));
 
         });
 
