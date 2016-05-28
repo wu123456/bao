@@ -76,7 +76,11 @@
 
 	// BaoComponent
 		+function(){
-			var revent = /<[\w\W]*@(onclick)="(\w*)"\s*[\s|>]/i;
+			var revent = /<[\w\W]*@(\w*)="(\w*)"\s*[\s|>]/i;
+			var events_map = {
+				'onclick' : 'click',
+				'onClick' : 'click'
+			}
 			function BaoComponent(params){
 				BaoObject.call(this);
 				this.node = null;
@@ -119,7 +123,8 @@
 				_bindEvent : function(){
 					var res = revent.exec(this.html);
 					console.log(res);
-					res && this.events && typeof this.events[res[2]] === 'function' && this.node.on('click', function(){
+					var event_type = events_map[res[1]] || res[1] || "";
+					res && this.events && typeof this.events[res[2]] === 'function' && this.node.on(event_type, function(){
 						(this.events[res[2]].bind(this))();
 					}.bind(this))
 				}
