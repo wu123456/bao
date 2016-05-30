@@ -76,7 +76,8 @@
 
 	// BaoComponent
 		+function(){
-			var revent = /<[\w\W]*@(\w*)="(\w*)"\s*[\s|>]/i;
+			var revent = /<.*bao(\w*)="(\w*)"\s*[\s|>]/g;
+			var rBaoSimple =  /(<.*)@(\w*="\w*"\s*[\s|>])/g;
 			var events_map = {
 				'onclick' : 'click',
 				'onClick' : 'click'
@@ -88,7 +89,7 @@
 				Bao.extend(this, params);
 				this.props = params.props || {}; // 用于储存不变的数据
 				this.state = params.state || {}; // 用于储存变化的数据（通过setState调用，引发变化后，会重新绘图）
-				this.tpl = params.tpl; // 用于绘图的模板
+				this.tpl = params.tpl.replace(rBaoSimple, '$1bao$2'); // 用于绘图的模板
 				this.preHandleFunc = params.preHandleFunc; // 用于预处理数据的函数
 			}
 			BaoComponent.prototype =  new BaoObject();
@@ -121,15 +122,23 @@
 					this.node.remove();
 				},
 				_bindEvent : function(){
-					var res = revent.exec(this.html);
-					console.log(res);
-					var event_type = events_map[res[1]] || res[1] || "";
-					res && this.events && typeof this.events[res[2]] === 'function' && this.node.on(event_type, function(){
-						(this.events[res[2]].bind(this))();
-					}.bind(this))
+					var res, event_type;
+					while(res = revent.exec(this.html)){
+						if (!(res && this.events && typeof this.events[res[2]] === 'function')) {
+							return;
+						};
+						(function(res_t){
+							event_type = events_map[res_t[1]] || res_t[1] || "";
+							this.node.find("[bao"+res_t[1]+"='" + res_t[2] + "']").on(event_type, function(){
+								return (this.events[res_t[2]].bind(this))();
+							}.bind(this));
+							this.node.attr("bao"+res_t[1]) === res_t[2] && this.node.on(event_type, function(){
+								return (this.events[res_t[2]].bind(this))();
+							}.bind(this));
+						}.bind(this))(res)
+					}
 				}
 			})
-			BaoComponent.prototype.toString = BaoComponent.prototype.render;
 
 			Bao.extend(Bao, {
 				// params contains tpl, preHandleFunc
