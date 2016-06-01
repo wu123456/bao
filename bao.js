@@ -110,6 +110,7 @@
 					// 变化之后，重新渲染
 					var node = $(html);
 					this.node.html(node.html());
+					this._bindEvent();
 				},
 				render : function(){
 					var data = (typeof this.preHandleFunc === "function") ? this.preHandleFunc() : this.defaultPreHandleFunc();
@@ -131,10 +132,10 @@
 							event_type = events_map[res_t[1]] || res_t[1] || "";
 							this.node.find("[bao"+res_t[1]+"='" + res_t[2] + "']").on(event_type, function(){
 								return (this.events[res_t[2]].bind(this))();
-							}.bind(this));
+							}.bind(this)).removeAttr("bao"+res_t[1]);
 							this.node.attr("bao"+res_t[1]) === res_t[2] && this.node.on(event_type, function(){
 								return (this.events[res_t[2]].bind(this))();
-							}.bind(this));
+							}.bind(this)).removeAttr("bao"+res_t[1]);
 						}.bind(this))(res)
 					}
 				}
