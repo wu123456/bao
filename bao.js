@@ -108,6 +108,7 @@
 						return;
 					};
 					// 变化之后，重新渲染
+					this.html = html;
 					var node = $(html);
 					this.node.html(node.html());
 					this._bindEvent();
