@@ -2,7 +2,8 @@
 Bao is a simple JavaScript library for building user interfaces.
 
 This is based on Zepto or jQuery.
-The bao component module looks like a sinple templating engine for JavaScript.In fact,I just want to make the code away from the operation of DOM.I want to operate the BaoComponent object instead of the DOM.
+The bao component module looks like a sinple templating engine for JavaScript.In fact,it is more like react than a templating  engine.
+The easier code, the better world.
 
 ##Examples
 
