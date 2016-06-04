@@ -1,10 +1,7 @@
 +function(window){
 	// Bao
-		var Bao = function(object){
-			var bao_object = new BaoObject();
-			bao_object.extend(object);
-			return bao_object;
-		}
+		var Bao = function(){
+		};
 
 		Bao.extend = function (target) {
 			var length = arguments.length, i = 1, p;
@@ -18,43 +15,11 @@
 		    return target;
 		};
 
-		Bao.createBaoObject = function(bao_class, params){
-			if (bao_class instanceof Function || (typeof bao_class == "string" && (bao_class = eval(bao_class)) && (bao_class instanceof Function))) {
-				return new bao_class(params);
-			};
-		};
-
 		Bao.classof = function(o){
 			if (o === null) {return "NULL"};
 			if (o === undefined) {return "UNDEFINED"};
 			return Object.prototype.toString.call(o).slice(8, -1);
 		};
-
-		Bao.drawTPL = function(tpl,data){
-	        var html ="";
-	        if (Bao.classof(data) == "Array") {
-	        	for(var i in data) {
-		            var content = tpl.replace(/\{(\w+)\}/g, function(m, key) {
-		                if(typeof(data[i][key]) != "undefined") {
-		                    return data[i][key];
-		                } else {
-		                    return m;
-		                }
-		            });
-		            html+=content;
-		        }
-	        }else if(Bao.classof(data) == "Object"){
-	        	var content = tpl.replace(/\{(\w+)\}/g, function(m, key) {
-	                if(typeof(data[key]) != "undefined") {
-	                    return data[key];
-	                } else {
-	                    return m;
-	                }
-	            });
-	            html+=content;
-	        }
-	        return html;
-	    };
 
 	    Bao.random = function(){
 	    	return (""+Math.random()).replace(".","");
@@ -62,17 +27,8 @@
 
 	    Bao.getHtml = function(node){
 	    	return node[0].outerHTML;
-	    }
+	    };
 
-
-
-	// BaoObject
-		function BaoObject(){
-		}
-
-		BaoObject.prototype.extend = function(source){
-			Bao.extend(this, source);
-		}
 
 	// BaoComponent
 		+function(){
@@ -83,7 +39,6 @@
 				'onClick' : 'click'
 			}
 			function BaoComponent(params){
-				BaoObject.call(this);
 				this.node = null;
 				this.html = '';
 				Bao.extend(this, params);
@@ -92,8 +47,6 @@
 				this.tpl = params.tpl.replace(rBaoSimple, '$1bao$2'); // 用于绘图的模板
 				this.preHandleFunc = params.preHandleFunc; // 用于预处理数据的函数
 			}
-			BaoComponent.prototype = new BaoObject();
-			BaoComponent.prototype.constructor = BaoComponent;
 
 			function drawNodeTPL(tpl,data){
 				var hash = {};
@@ -204,108 +157,6 @@
 				}
 			});
 		}()
-		
-
-	// BaoConnect
-		function BaoConnect(){
-			BaoObject.call(this);
-		}
-
-		BaoConnect.prototype =  new BaoObject();
-		BaoConnect.prototype.constructor = BaoConnect;
-
-	// BaoHttpConnect
-		function BaoHttpConnect(params){
-			BaoConnect.call(this);
-			this['url'] = params['url'];
-			this['method'] = params['method'];
-		}
-
-		BaoHttpConnect.prototype =  new BaoConnect();
-		BaoHttpConnect.prototype.constructor = BaoHttpConnect;
-
-		BaoHttpConnect.prototype.request = function(){
-
-			var params = arguments[0]['params'];
-			var successCallback = arguments[0]['success'];
-			var beforeFunction = arguments[0]['before'];
-			var errorCallback = arguments[0]['error'];
-			var timeout = arguments[0]['timeout'] || 10000;
-
-			var url = this['url'];
-		    var method = this['method'];
-
-		    if (Bao.classof(beforeFunction) == "Function") {
-		    	beforeFunction();
-		    };
-			$.ajax({
-			    type: method,
-			    url: url,
-			    data: params,
-			    dataType: "json",
-			    timeout: timeout,
-			    success: function(data, textStatus){
-			    	if (Bao.classof(successCallback) == "Function") {
-			    		successCallback(data, textStatus);
-			    	};
-			    },
-			    error: function(XMLHttpRequest, textStatus, errorThrown){
-			    	if (Bao.classof(errorCallback) == "Function") {
-			    		errorCallback(XMLHttpRequest, textStatus, errorThrown);
-			    	};
-			    }
-			 });
-		}
-
-	// BaoModule
-		function BaoModule(connects){
-			BaoObject.call(this);
-			this.connects = connects;
-			this.init();
-		}
-
-		BaoModule.prototype =  new BaoObject();
-		BaoModule.prototype.constructor = BaoModule;
-
-		BaoModule.prototype.init = function(){
-
-		}
-
-		BaoModule.prototype.request = function(){
-			var name, params, successCallback, beforeFunction, errorCallback, timeout;
-			if (arguments.length == 1) {
-				name = arguments[0]['name'];
-				params = arguments[0]['params'];
-				successCallback = arguments[0]['success'];
-				beforeFunction = arguments[0]['before'];
-				errorCallback = arguments[0]['error'];
-				timeout = arguments[0]['timeout'];
-			}else{
-				name = arguments[0];
-				params = arguments[1];
-				successCallback = arguments[2];
-				beforeFunction = arguments[3];
-				errorCallback = arguments[4];
-				timeout = arguments[5];
-			}
-
-			if (!(this.connects[name] instanceof BaoConnect)) {
-				this.connects[name] = Bao.createBaoObject(this.connects[name]['class'], this.connects[name]);
-			};
-
-			this.connects[name].request(
-				{
-					params : params,
-					success : successCallback,
-					before : beforeFunction,
-					error : errorCallback,
-					timeout : timeout
-				}
-			);
-		}
 
 	window.Bao = Bao;
-	window.BaoObject = BaoObject;
-	window.BaoConnect = BaoConnect;
-	window.BaoModule = BaoModule;
 }(window)
