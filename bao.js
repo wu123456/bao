@@ -61,11 +61,7 @@
 	    };
 
 	    Bao.getHtml = function(node){
-	    	var a = $("<div></div>"), html;
-	    	a.append(node.clone());
-	    	html = a.html();
-	    	a.remove();
-	    	return html;
+	    	return node[0].outerHTML;
 	    }
 
 
