@@ -1,8 +1,8 @@
 # bao
-Bao is a simple JavaScript library for building user interfaces.
+Bao is a simple JavaScript library with only one hundred lines code.It provides data-reactive components with a simple and flexible API. 
 
-This is based on Zepto or jQuery.
-The bao component module looks like a sinple templating engine for JavaScript.In fact,it is more like react than a templating  engine.
+There are still many projects based on Zepto or jQuery even now.And so does my company project.I need a simple and useful JavaScript libaray which provides data-reactive components.The ReactJs and VueJs can almost meet my needs,but they are based on native JavaScript,so they are bigger than my BaoJs.
+BaoJs is based on Zepto or jQuery.If your project has already use Zepto or jQuery,it needs only one hundred lines code to use a library which provides data-reactive components.If you are only family with jQuery,just use Bao because it is very kind for a new coder.That's why I wrote it.
 
 The easier code, the better world.
 
