@@ -22,13 +22,13 @@
 			if (bao_class instanceof Function || (typeof bao_class == "string" && (bao_class = eval(bao_class)) && (bao_class instanceof Function))) {
 				return new bao_class(params);
 			};
-		}
+		};
 
 		Bao.classof = function(o){
 			if (o === null) {return "NULL"};
 			if (o === undefined) {return "UNDEFINED"};
 			return Object.prototype.toString.call(o).slice(8, -1);
-		}
+		};
 
 		Bao.drawTPL = function(tpl,data){
 	        var html ="";
@@ -54,17 +54,21 @@
 	            html+=content;
 	        }
 	        return html;
+	    };
+
+	    Bao.random = function(){
+	    	return (""+Math.random()).replace(".","");
+	    };
+
+	    Bao.getHtml = function(node){
+	    	var a = $("<div></div>"), html;
+	    	a.append(node.clone());
+	    	html = a.html();
+	    	a.remove();
+	    	return html;
 	    }
 
-	    Bao.render = function(tpl, data, container, type){
-	    	// 老版本的render
-	    	var html = Bao.drawTPL(tpl, data);
-	    	if (type === 'append') {
-	    		$(container).append(html);
-	    		return;
-	    	};
-	    	$(container).html(html);
-	    }
+
 
 	// BaoObject
 		function BaoObject(){
@@ -92,8 +96,30 @@
 				this.tpl = params.tpl.replace(rBaoSimple, '$1bao$2'); // 用于绘图的模板
 				this.preHandleFunc = params.preHandleFunc; // 用于预处理数据的函数
 			}
-			BaoComponent.prototype =  new BaoObject();
+			BaoComponent.prototype = new BaoObject();
 			BaoComponent.prototype.constructor = BaoComponent;
+
+			function drawNodeTPL(tpl,data){
+				var hash = {};
+	        	var content = tpl.replace(/\{(\w+)\}/g, function(m, key) {
+	        		if (Bao.classof(data[key]) == "Array") {
+	        			hash[key] = key + Bao.random();
+	        			return "<div class='" + hash[key] + "'></div>";
+	        		} else if(data[key] instanceof BaoComponent){
+	        			return data[key].render().html();
+	        		} else if (typeof(data[key]) != "undefined") {
+	                    return data[key];
+	                } else {
+	                    return m;
+	                }
+	            });
+	            content = $(content);
+	            for(var i in hash){
+	            	Bao.renderBaoComponent(data[i], content.find("." + hash[i]), 'before');
+	            	content.find("." + hash[i]).remove()
+	            }
+		        return content;
+		    }
 
 			Bao.extend(BaoComponent.prototype,{
 				defaultPreHandleFunc : function(){
@@ -102,21 +128,21 @@
 				setState : function(params){
 					this.state = Bao.extend(this.state, params);
 					var data = (typeof this.preHandleFunc === "function") ? this.preHandleFunc() : this.defaultPreHandleFunc();
-					var html = Bao.drawTPL(this.tpl, data);
+					var node = drawNodeTPL(this.tpl, data);
 					// 没有变化，不需要重新渲染
-					if (html === this.html) {
+					if (Bao.getHtml(this.node) === this.html) {
 						return;
 					};
 					// 变化之后，重新渲染
-					this.html = html;
-					var node = $(html);
+					this.html = Bao.getHtml(this.node);
+					var node = node;
 					this.node.html(node.html());
-					this._bindEvent();
+					this.html && this._bindEvent();
 				},
 				render : function(){
 					var data = (typeof this.preHandleFunc === "function") ? this.preHandleFunc() : this.defaultPreHandleFunc();
-					this.html = Bao.drawTPL(this.tpl, data);
-					this.node = $(this.html);
+					this.node = drawNodeTPL(this.tpl, data);
+					this.html = Bao.getHtml(this.node);
 					this.html && this._bindEvent();
 					return this.node;
 				},
@@ -139,9 +165,18 @@
 							}.bind(this)).removeAttr("bao"+res_t[1]);
 						}.bind(this))(res)
 					}
+				},
+				toString : function(){
+					var data = (typeof this.preHandleFunc === "function") ? this.preHandleFunc() : this.defaultPreHandleFunc();
+					return "" + drawNodeTPL(this.tpl, data);
 				}
 			})
 
+			var type2Method = {
+				append : $.fn.append,
+				after : $.fn.after,
+				before : $.fn.before
+			}
 			Bao.extend(Bao, {
 				// params contains tpl, preHandleFunc
 				createBaoComponent : function(params){
@@ -151,20 +186,24 @@
 					BComponent.prototype = BaoComponent.prototype;
 					return BComponent;
 				},
-				renderBaoComponent : function(c, target){
+				renderBaoComponent : function(c, target, type){
+					if (type == undefined) {
+						type = 'append';
+					};
+					var method = type2Method[type];
 					var i;
 					if (Bao.classof(c) == "Array") {
 						str = c.forEach(function(cur){
-							$(target).append(cur.render());
+							method.apply($(target),cur.render());
 						});
 					}else if(c instanceof BaoComponent){
-						$(target).append(c.render());
+						method.apply($(target),c.render());
 					}else if(Bao.classof(c) == "Object"){
 						for( i in c ){
-							$(target).append(c[i].render());
+							method.apply($(target),c[i].render());
 						}
 					}else{
-						$(target).append(c);
+						method.apply($(target),c);
 					}
 				}
 			});
@@ -227,7 +266,6 @@
 			BaoObject.call(this);
 			this.connects = connects;
 			this.init();
-
 		}
 
 		BaoModule.prototype =  new BaoObject();
