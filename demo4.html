@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="content-type" content="text/html;charset=utf-8"/>
+        <meta name="keywords" content="keywords"/>
+        <meta name="description" content="description"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+        <meta name="apple-mobile-web-app-capable" content="yes"/>
+        <meta name="format-detection" content="telephone=no"/>
+        <title>欢迎使用BaoJs</title>
+        <script src="http://apps.bdimg.com/libs/zepto/1.1.4/zepto.min.js"></script>
+        <script src="./bao.js"></script>
+
+        <style type="text/css">
+            html {height: 100%;}
+            body { margin: 0px; color: #999999; background: #fff;height: 100%;}
+            *{box-sizing:border-box;}
+            .row{height: 60px; line-height: 60px; width: 100%; background: #fff; margin-top: 1px;}
+            .news{background: #666;color:#fff;}
+            .row:first-child{ margin-top: 10px; }
+            .content{float: left; width: 70%; overflow: hidden; line-height: 60px; height: 60px; padding-left: 1em;}
+            .time{float: right; width: 30%; overflow: hidden; line-height: 60px; height: 60px; text-align: right; padding-right: 1em;}
+            .clearfix { *zoom: 1; clear: both; }
+            .clearfix:before, .clearfix:after { display: table; line-height: 0; content: ""; }
+            .clearfix:after { clear: both; }
+            .chat-list{margin: 0 auto;width: 100%;height: 100%;max-width: 480px; background: #f2f2f2;padding-top: 1px;}
+        </style>
+
+    </head>
+    <body>
+        
+        
+    </body>
+
+    <script type="text/html" id="comment_tpl">
+        <div class="row" @click="showAuthor">
+            <span class="content">{content}</span>
+            <span class="time" @click="showTime">{time}</span>
+            <div class="clearfix"></div>
+        </div>
+    </script>
+
+    <script type="text/html" id="news_tpl">
+        <div>
+            <div class="row news" @click="showAuthor">
+                <span class="content">{content}</span>
+                <span class="time" @click="showTime">{time}</span>
+                <div class="clearfix"></div>
+            </div>
+            {comments}
+        </div>
+    </script>
+
+    <script type="text/html" id="list_tpl">
+        <div class="chat-list">{news}</div>
+    </script>
+
+    <script type="text/javascript">
+
+        var ChatItem = Bao.createBaoComponent({
+            tpl : $("#comment_tpl").html(),
+            events : {
+                showAuthor : function(){
+                    alert("作者是" + this.props.author);
+                },
+                showTime : function(){
+                    alert("时间是" + this.props.time);
+                    return false;
+                }
+            }
+        });
+
+        var NewsItem = Bao.createBaoComponent({
+            tpl : $("#news_tpl").html(),
+            events : {
+                showAuthor : function(){
+                    alert("作者是" + this.props.author);
+                },
+                showTime : function(){
+                    alert("时间是" + this.props.time);
+                    return false;
+                }
+            }
+        });
+
+        var List = Bao.createBaoComponent({
+            tpl : $("#list_tpl").html(),
+        });
+
+
+        $(function(){
+
+            var list = new List({
+                componentDidMount : function(){
+                    var self = this;
+                    $.getJSON(
+                        './demo_data.json',
+                        function(data){
+                            
+                            var chat_items = [], chat_item, news_items = [], news_iteam, news_list = data;
+                            for(var i in news_list){
+                                chat_items = [];
+                                for(var j in news_list[i]['comments']){
+                                    chat_item = new ChatItem({
+                                        props : news_list[i]['comments'][j]
+                                    })
+                                    chat_items.push(chat_item);
+                                }
+                                news_iteam = new NewsItem({
+                                    props : {
+                                        content : news_list[i]['content'],
+                                        author : news_list[i]['author'],
+                                        time : news_list[i]['time'],
+                                        comments : chat_items
+                                    }
+                                });
+                                news_items.push(news_iteam);
+                            }
+                            self.setState({news : news_items});
+                        }
+                    )   
+                }
+            });
+
+            Bao.renderBaoComponent(list, "body");
+        });
+
+
+    </script>
+
+    
+</html>
