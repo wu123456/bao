@@ -53,6 +53,7 @@
 	        	var content = tpl.replace(/\{(\w+)\}/g, function(m, key) {
 	        		if (Bao.classof(data[key]) == "Array") {
 	        			hash[key] = key + Bao.random();
+	        			console.log(1111);
 	        			return "<div class='" + hash[key] + "'></div>";
 	        		} else if(data[key] instanceof BaoComponent){
 	        			return data[key].render().html();
@@ -65,7 +66,7 @@
 	            content = $(content);
 	            for(var i in hash){
 	            	Bao.renderBaoComponent(data[i], content.find("." + hash[i]), 'before');
-	            	content.find("." + hash[i]).remove()
+	            	content.find("." + hash[i]).remove();
 	            }
 		        return content;
 		    }
@@ -79,16 +80,15 @@
 					var data = (typeof this.preHandleFunc === "function") ? this.preHandleFunc() : this.defaultPreHandleFunc();
 					var node = drawNodeTPL(this.tpl, data);
 					// 没有变化，不需要重新渲染
-					if (Bao.getHtml(this.node) === this.html) {
+					if (Bao.getHtml(node) === this.html) {
 						return;
 					};
 					// 变化之后，重新渲染
-					this.html = Bao.getHtml(this.node);
-					var node = node;
+					this.html = Bao.getHtml(node);
 					this.node.html(node.html());
 					this.html && this._bindEvent();
 				},
-				render : function(){
+				_render : function(){
 					var data = (typeof this.preHandleFunc === "function") ? this.preHandleFunc() : this.defaultPreHandleFunc();
 					this.node = drawNodeTPL(this.tpl, data);
 					this.html = Bao.getHtml(this.node);
@@ -117,7 +117,11 @@
 				},
 				toString : function(){
 					var data = (typeof this.preHandleFunc === "function") ? this.preHandleFunc() : this.defaultPreHandleFunc();
-					return "" + drawNodeTPL(this.tpl, data);
+					return Bao.getHtml(drawNodeTPL(this.tpl, data));
+				},
+				render : function(target, method){
+					method.apply($(target), this._render());
+					(typeof this.componentDidMount === "function") && this.componentDidMount();
 				}
 			})
 
@@ -143,13 +147,16 @@
 					var i;
 					if (Bao.classof(c) == "Array") {
 						str = c.forEach(function(cur){
-							method.apply($(target),cur.render());
+							// method.apply($(target),cur.render());
+							cur.render(target, method);
 						});
 					}else if(c instanceof BaoComponent){
-						method.apply($(target),c.render());
+						// method.apply($(target),c.render());
+						c.render(target, method);
 					}else if(Bao.classof(c) == "Object"){
 						for( i in c ){
-							method.apply($(target),c[i].render());
+							c[i].render(target, method);
+							// method.apply($(target),c[i].render());
 						}
 					}else{
 						method.apply($(target),c);
