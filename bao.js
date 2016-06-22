@@ -85,8 +85,12 @@
 					};
 					// 变化之后，重新渲染
 					this.html = Bao.getHtml(node);
-					this.node.html(node.html());
+					// this.node.html(node.html());
+					this.node.after(node);
+					this.node.remove();
+					this.node = node;
 					this.html && this._bindEvent();
+					(typeof this.componentDidUpdate === "function") && this.componentDidUpdate();
 				},
 				_render : function(){
 					var data = (typeof this.preHandleFunc === "function") ? this.preHandleFunc() : this.defaultPreHandleFunc();
