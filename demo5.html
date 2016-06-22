@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="content-type" content="text/html;charset=utf-8"/>
+        <meta name="keywords" content="keywords"/>
+        <meta name="description" content="description"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+        <meta name="apple-mobile-web-app-capable" content="yes"/>
+        <meta name="format-detection" content="telephone=no"/>
+        <title>欢迎使用BaoJs</title>
+        <script src="http://apps.bdimg.com/libs/zepto/1.1.4/zepto.min.js"></script>
+        <script src="./bao.js"></script>
+
+        <style type="text/css">
+            html {height: 100%;}
+            body { margin: 0px; color: #999999; background: #fff;height: 100%;}
+            *{box-sizing:border-box;}
+            .row{height: 60px; line-height: 60px; width: 100%; background: #fff; margin-top: 1px;}
+            .row:first-child{ margin-top: 10px; }
+            .content{float: left; width: 70%; overflow: hidden; line-height: 60px; height: 60px; padding-left: 1em;}
+            .time{float: right; width: 30%; overflow: hidden; line-height: 60px; height: 60px; text-align: right; padding-right: 1em;}
+            .clearfix { *zoom: 1; clear: both; }
+            .clearfix:before, .clearfix:after { display: table; line-height: 0; content: ""; }
+            .clearfix:after { clear: both; }
+            .chat-list{margin: 0 auto;width: 100%;height: 100%;max-width: 480px; background: #f2f2f2;padding-top: 1px;}
+        </style>
+
+    </head>
+    <body>
+        <div class="chat-list"></div>
+        
+    </body>
+
+    <script type="text/html" id="item_tpl">
+        <div class="row" @click="show" style="background-color:#{color}">
+            <span class="content">{content}</span>
+            <span class="time">{time}</span>
+            <div class="clearfix"></div>
+        </div>
+    </script>
+
+    <script type="text/javascript">
+
+        // 用来模拟json请求的数据
+        var chat_list = [
+            {
+                content : "我觉得5楼说的很对",
+                time : '17:00:00',
+                author : 'aa'
+            },
+            {
+                content : "我也这么觉得",
+                time : '17:01:00',
+                author : 'aab'
+            },
+            {
+                content : "5楼说的太有道理了",
+                time : '17:02:00',
+                author : 'aca'
+            },
+            {
+                content : "我支持5楼的看法",
+                time : '17:03:00',
+                author : 'aaa'
+            },
+            {
+                content : "楼上都是傻逼",
+                time : '17:04:00',
+                author : 'asa'
+            }
+        ];
+
+        var chat_items = [], chat_item;
+
+        $(function(){
+            var ChatItem = Bao.createBaoComponent({
+                tpl : $("#item_tpl").html(),
+                events : {
+                    show : function(){
+                        alert("作者是" + this.props.author);
+                    }
+                },
+                componentDidUpdate : function(){
+                    var self = this;
+                    setTimeout(function(){
+                        self.setState({color : randomColor()});
+                    }, 1000);
+                },
+
+                componentDidMount : function(){
+                    this.setState({color : randomColor()});
+                }
+            });
+
+            for(var i in chat_list){
+                chat_list[i]['color'] = "213124";
+                chat_item = new ChatItem({
+                    props : chat_list[i],
+                });
+                chat_items.push(chat_item);
+            }
+
+            Bao.renderBaoComponent(chat_items, $(".chat-list"));
+
+        });
+
+        function randomColor(){
+            var a = ['0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'], res = "";
+            for(var i = 0; i < 6; i++){
+                res += a[Math.floor((Math.random() * 16))];
+            }
+            return res;
+        }
+
+
+    </script>
+
+    
+</html>
