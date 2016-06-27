@@ -75,7 +75,7 @@ This example will render "Hello Awu" into a container on the page.
 
 The fastest way to get started is to serve JavaScript download the Bao.js.
 ```html
-<!-- The Zepyo library -->
+<!-- The Zepto library -->
 <script src="./js/Zepto.min.js"></script>
 <!-- The core Bao library -->
 <script src="./js/Bao.js"></script>
