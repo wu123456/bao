@@ -124,7 +124,7 @@
 					return Bao.getHtml(drawNodeTPL(this.tpl, data));
 				},
 				render : function(target, method){
-					method.apply($(target), this._render());
+					method.call($(target), this._render());
 					(typeof this.componentDidMount === "function") && this.componentDidMount();
 				}
 			})
@@ -151,19 +151,16 @@
 					var i;
 					if (Bao.classof(c) == "Array") {
 						str = c.forEach(function(cur){
-							// method.apply($(target),cur.render());
-							cur.render(target, method);
+							(cur instanceof BaoComponent) ? cur.render(target, method) : method.call($(target),cur);
 						});
 					}else if(c instanceof BaoComponent){
-						// method.apply($(target),c.render());
 						c.render(target, method);
 					}else if(Bao.classof(c) == "Object"){
 						for( i in c ){
-							c[i].render(target, method);
-							// method.apply($(target),c[i].render());
+							(c[i] instanceof BaoComponent) ? c[i].render(target, method) : method.call($(target),c[i]);
 						}
 					}else{
-						method.apply($(target),c);
+						method.call($(target),c);
 					}
 				}
 			});
