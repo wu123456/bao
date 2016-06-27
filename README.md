@@ -8,9 +8,9 @@ The easier code, the better world.
 
 ##API
 
-> TOP-LEVEL-API
+### TOP-LEVEL-API
 
-###Bao.createBaoComponent
+> Bao.createBaoComponent
 
 ```javascript
 BaoComponent createBaoComponent(object specification)
@@ -19,7 +19,7 @@ BaoComponent createBaoComponent(object specification)
 Create a component class, given a specification. A component needs a `tpl` property which owns **one single** child. That child may have an arbitrarily deep child structure. The components are same as standard prototypal classes because Bao didn't realize the React JSX. You can construct backing instances via `new`. 
 
 
-### Bao.renderBaoComponent
+> Bao.renderBaoComponent
 
 ```javascript
 renderBaoComponent(
@@ -32,9 +32,9 @@ Render a BaoElement into the DOM in the supplied `container`.
 
 If the BaoElement was previously rendered into `container`, this will be wrong. This means a BaoComponent instance can be renderred only once.
 
-> COMPONENT-API
+### COMPONENT-API
 
-### setState
+> setState
 
 ```javascript
 void setState(
