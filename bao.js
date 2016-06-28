@@ -3,42 +3,38 @@
 		var Bao = function(){
 		};
 
-		// 定义extend方法
-		+function(){
-			Bao.extend = function (target) {
-				// var length = arguments.length, i = 1, p;
-				var deep, args = Array.prototype.slice.call(arguments, 1);
-			    if (typeof target == 'boolean') {
-			     	deep = target;
-			      	target = args.shift();
-			    }
+		Bao.extend = function (target) {
+			var deep, args = Array.prototype.slice.call(arguments, 1);
+		    if (typeof target == 'boolean') {
+		     	deep = target;
+		      	target = args.shift();
+		    }
 
-			    args.forEach(function(arg){ 
-			    	extend(target, arg, deep); 
-				});
-			    return target;
-			};
+		    args.forEach(function(arg){ 
+		    	extend(target, arg, deep); 
+			});
+		    return target;
+		};
 
-			function extend(target, source, deep) {
-			    for (key in source){
-			      	if (deep && (isPlainObject(source[key]) || Bao.classof(source[key]) === "Array")) {
-			        	if (isPlainObject(source[key]) && !isPlainObject(target[key])){
-			          		target[key] = {};
-			        	}
-			        	if (Bao.classof(source[key]) === "Array" && Bao.classof(target[key]) !== "Array"){
-			          		target[key] = [];
-			        	}
-			        	arguments.callee(target[key], source[key], deep);
-			    	}else if (source[key] !== undefined) {
-			    		target[key] = source[key];
-			    	}
-			    }
-			}
+		function extend(target, source, deep) {
+		    for (key in source){
+		      	if (deep && (isPlainObject(source[key]) || Bao.classof(source[key]) === "Array")) {
+		        	if (isPlainObject(source[key]) && !isPlainObject(target[key])){
+		          		target[key] = {};
+		        	}
+		        	if (Bao.classof(source[key]) === "Array" && Bao.classof(target[key]) !== "Array"){
+		          		target[key] = [];
+		        	}
+		        	arguments.callee(target[key], source[key], deep);
+		    	}else if (source[key] !== undefined) {
+		    		target[key] = source[key];
+		    	}
+		    }
+		}
 
-			function isPlainObject(obj) {
-			    return Bao.classof(obj) === "Object" && obj != obj.window && Object.getPrototypeOf(obj) == Object.prototype
-			}
-		}();
+		function isPlainObject(obj) {
+		    return Bao.classof(obj) === "Object" && obj != obj.window && Object.getPrototypeOf(obj) == Object.prototype
+		}
 
 		Bao.classof = function(o){
 			if (o === null) {return "NULL"};
