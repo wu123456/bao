@@ -3,17 +3,42 @@
 		var Bao = function(){
 		};
 
-		Bao.extend = function (target) {
-			var length = arguments.length, i = 1, p;
-			for(; i < length; i++){
-				for ( p in arguments[i] ) {
-			        if (arguments[i].hasOwnProperty(p)) {
-			            target[p] = arguments[i][p];
-			        }
+		// 定义extend方法
+		+function(){
+			Bao.extend = function (target) {
+				// var length = arguments.length, i = 1, p;
+				var deep, args = Array.prototype.slice.call(arguments, 1);
+			    if (typeof target == 'boolean') {
+			     	deep = target;
+			      	target = args.shift();
+			    }
+
+			    args.forEach(function(arg){ 
+			    	extend(target, arg, deep); 
+				});
+			    return target;
+			};
+
+			function extend(target, source, deep) {
+			    for (key in source){
+			      	if (deep && (isPlainObject(source[key]) || Bao.classof(source[key]) === "Array")) {
+			        	if (isPlainObject(source[key]) && !isPlainObject(target[key])){
+			          		target[key] = {};
+			        	}
+			        	if (Bao.classof(source[key]) === "Array" && Bao.classof(target[key]) !== "Array"){
+			          		target[key] = [];
+			        	}
+			        	arguments.callee(target[key], source[key], deep);
+			    	}else if (source[key] !== undefined) {
+			    		target[key] = source[key];
+			    	}
 			    }
 			}
-		    return target;
-		};
+
+			function isPlainObject(obj) {
+			    return Bao.classof(obj) === "Object" && obj != obj.window && Object.getPrototypeOf(obj) == Object.prototype
+			}
+		}();
 
 		Bao.classof = function(o){
 			if (o === null) {return "NULL"};
@@ -72,12 +97,16 @@
 		    }
 
 			Bao.extend(BaoComponent.prototype,{
-				defaultPreHandleFunc : function(){
-					return Bao.extend({},this.props, this.state);
+				_preHandleFunc : function(){
+					var p = Bao.extend({}, this.props, this.state);
+					if (typeof this.preHandleFunc === "function") {
+						p = this.preHandleFunc(p);
+					};
+					return p;
 				},
 				setState : function(params){
 					this.state = Bao.extend(this.state, params);
-					var data = (typeof this.preHandleFunc === "function") ? this.preHandleFunc() : this.defaultPreHandleFunc();
+					var data = this._preHandleFunc();
 					var node = drawNodeTPL(this.tpl, data);
 					// 没有变化，不需要重新渲染
 					if (Bao.getHtml(node) === this.html) {
@@ -93,7 +122,7 @@
 					(typeof this.componentDidUpdate === "function") && this.componentDidUpdate();
 				},
 				_render : function(){
-					var data = (typeof this.preHandleFunc === "function") ? this.preHandleFunc() : this.defaultPreHandleFunc();
+					var data = this._preHandleFunc();
 					this.node = drawNodeTPL(this.tpl, data);
 					this.html = Bao.getHtml(this.node);
 					this.html && this._bindEvent();
@@ -120,7 +149,7 @@
 					}
 				},
 				toString : function(){
-					var data = (typeof this.preHandleFunc === "function") ? this.preHandleFunc() : this.defaultPreHandleFunc();
+					var data = this._preHandleFunc();
 					return Bao.getHtml(drawNodeTPL(this.tpl, data));
 				},
 				render : function(target, method){
@@ -138,7 +167,7 @@
 				// params contains tpl, preHandleFunc
 				createBaoComponent : function(params){
 					var BComponent = function(p){
-						BaoComponent.call(this, Bao.extend({}, params, p));
+						BaoComponent.call(this, Bao.extend(true, {}, params, p));
 					}
 					BComponent.prototype = BaoComponent.prototype;
 					return BComponent;
