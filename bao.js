@@ -94,7 +94,7 @@
 
 			Bao.extend(BaoComponent.prototype,{
 				_preHandleFunc : function(){
-					var p = Bao.extend({}, this.props, this.state);
+					var p = Bao.extend(true, {}, this.props, this.state);
 					if (typeof this.preHandleFunc === "function") {
 						p = this.preHandleFunc(p);
 					};
