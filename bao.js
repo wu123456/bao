@@ -128,7 +128,7 @@
 					this.node.remove();
 				},
 				_bindEvent : function(){
-					var res, event_type;
+					var res, event_type, self = this;
 					while(res = revent.exec(this.html)){
 						if (!(res && this.events && typeof this.events[res[2]] === 'function')) {
 							return;
@@ -136,11 +136,11 @@
 						(function(res_t){
 							event_type = events_map[res_t[1]] || res_t[1] || "";
 							this.node.find("[bao"+res_t[1]+"='" + res_t[2] + "']").on(event_type, function(){
-								return (this.events[res_t[2]].bind(this))();
-							}.bind(this)).removeAttr("bao"+res_t[1]);
+								return (self.events[res_t[2]].bind(self, this))();
+							}).removeAttr("bao"+res_t[1]);
 							this.node.attr("bao"+res_t[1]) === res_t[2] && this.node.on(event_type, function(){
-								return (this.events[res_t[2]].bind(this))();
-							}.bind(this)).removeAttr("bao"+res_t[1]);
+								return (self.events[res_t[2]].bind(self, this))();
+							}).removeAttr("bao"+res_t[1]);
 						}.bind(this))(res)
 					}
 				},
