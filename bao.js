@@ -53,8 +53,8 @@
 
 	// BaoComponent
 		+function(){
-			var revent = /<.*bao(\w*)="(\w*)"\s*[\s|>]/g;
-			var rBaoSimple =  /(<.*)@(\w*="\w*"\s*[\s|>])/g;
+			var revent = /<[^>]*bao(\w*)="(\w*)"\s*[\s|>]/g;
+			var rBaoSimple =  /(<[^>]*)@(\w*="\w*"\s*[\s|>])/g;
 			var events_map = {
 				'onclick' : 'click',
 				'onClick' : 'click'
