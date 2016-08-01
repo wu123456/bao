@@ -85,6 +85,10 @@ The fastest way to get started is to serve JavaScript download the Bao.js.
 
 The main purpose of this repository is to continue to evolve Bao core, making it faster and easier to use. If you're interested in helping with that, then keep reading and contact with me by sending e-mail to 'littlewu3991@foxmail.com'. If you're not interested in helping right now that's ok too. :)
 
+##ToDo
+
+It seems a stable version now. I will improve the DOM diff algorithm from a string comparison to the React DOM diff algorithm.
+
 ##License
 
 MIT
